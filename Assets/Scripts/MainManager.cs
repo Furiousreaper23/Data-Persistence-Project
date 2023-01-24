@@ -11,21 +11,34 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text bestScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
     private int m_Points;
+    [SerializeField] private string PlayerName = "";
+    [SerializeField] private int m_HighPoints = 0;
     
     private bool m_GameOver = false;
+    private bool _reset = false;
 
     
     // Start is called before the first frame update
     void Start()
     {
+        m_Points = 0;
+
+        if(MainManagerX.Instance.m_highScore > 0)
+        {
+            m_HighPoints = MainManagerX.Instance.m_highScore;
+        }
+
+        bestScoreText.text = "Best Score :" + MainManagerX.Instance.PlayerName + " : " + MainManagerX.Instance.m_highScore;
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
-        int[] pointCountArray = new [] {1,1,2,2,5,5};
+        int[] pointCountArray = new [] { 1, 1, 2, 2, 5, 5};
         for (int i = 0; i < LineCount; ++i)
         {
             for (int x = 0; x < perLine; ++x)
@@ -72,5 +85,33 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        HighScore();
+    }
+   
+    void HighScore()
+    {
+        if(!_reset)
+        {
+            if(m_Points > m_HighPoints)
+            {
+            m_HighPoints = m_Points;
+            PlayerName = MainManagerX.Instance.m_cPlayerName;
+            bestScoreText.text = "Best Score : " + PlayerName + " : " + m_HighPoints;
+            MainManagerX.Instance.PlayerName = PlayerName;
+            MainManagerX.Instance.m_highScore = m_HighPoints;
+
+            MainManagerX.Instance.SaveName();
+            }
+        }
+        else
+        {
+            m_HighPoints = 0;
+            PlayerName = MainManagerX.Instance.m_cPlayerName;
+            bestScoreText.text = "Best Score : " + PlayerName + " : " + m_HighPoints;
+            MainManagerX.Instance.PlayerName = PlayerName;
+            MainManagerX.Instance.m_highScore = m_HighPoints;
+
+            MainManagerX.Instance.SaveName();
+        }
     }
 }
